@@ -3,7 +3,6 @@ package penguintypes
 import (
 	"encoding/json"
 	"github.com/The-Penguin-Circle/chat-backend/generation"
-	"log"
 	"math/rand"
 )
 
@@ -68,13 +67,19 @@ func findMatches() {
 			"match-success",
 			newChat,
 		})
-		packet, err := json.Marshal(newChat)
-		if err != nil {
-			log.Println(err)
-		}
 
-		query1.user.WebSocket.WriteMessage(1, packet)
-		query2.user.WebSocket.WriteMessage(1, packet)
+		query1.user.WebSocket.WriteJSON(
+			struct {
+				Type string `json:"type"`
+				Data Chat   `json:"data"`
+			}{"chat-found", newChat},
+		)
+		query2.user.WebSocket.WriteJSON(
+			struct {
+				Type string `json:"type"`
+				Data Chat   `json:"data"`
+			}{"chat-found", newChat},
+		)
 
 		return newChat
 	}

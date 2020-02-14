@@ -55,5 +55,12 @@ func execChatPacket(p []byte, conn *websocket.Conn) error {
 		log.Println(err)
 	}
 
+	err = conn.WriteJSON(struct {
+		Type string `json:"type"`
+	}{"ok"})
+	if err != nil {
+		log.Println(err)
+	}
+
 	return nil
 }

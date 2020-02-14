@@ -12,7 +12,7 @@ type User struct {
 	Username     string          `json:"username"`
 	ProfileImage string          `json:"image"`
 	WebSocket    *websocket.Conn `json:"-"`
-	CurrentChat  *Chat
+	CurrentChat  *Chat           `json:"-"`
 }
 
 // A ChatQuery is the query that is stored in the database as long as
