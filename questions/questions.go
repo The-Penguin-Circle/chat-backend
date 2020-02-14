@@ -13,6 +13,7 @@ import (
 
 type Question struct {
 	Text string `json:"text"`
+	Id   int    `json:"id"`
 }
 
 var questionPool []Question
@@ -32,6 +33,10 @@ func init() {
 
 	if err = json.Unmarshal(byteValue, &questionPool); err != nil {
 		log.Fatal(err)
+	}
+
+	for i := range questionPool {
+		questionPool[i].Id = i
 	}
 }
 
