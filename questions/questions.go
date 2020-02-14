@@ -13,7 +13,7 @@ import (
 
 type Question struct {
 	Text string `json:"text"`
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 }
 
 var questionPool []Question
@@ -22,6 +22,7 @@ var random = rand.New(rand.NewSource(time.Now().Unix()))
 
 func init() {
 	jsonPath := "files/questions.json"
+
 	jsonFile, err := os.Open(jsonPath)
 	if err != nil {
 		log.Fatal(err)
@@ -31,12 +32,13 @@ func init() {
 		log.Fatal(err)
 	}
 
-	if err = json.Unmarshal(byteValue, &questionPool); err != nil {
+	err = json.Unmarshal(byteValue, &questionPool)
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	for i := range questionPool {
-		questionPool[i].Id = i
+		questionPool[i].ID = i
 	}
 }
 
