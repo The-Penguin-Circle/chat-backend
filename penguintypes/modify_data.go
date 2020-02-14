@@ -10,7 +10,6 @@ import (
 func InsertUser(questionID int, answer string) *User {
 	user := User{
 		Identifier:   UserIdentifier(randStringRunes(10)),
-		currentChat:  nil,
 		Username:     generation.GenerateUsername(),
 		ProfileImage: generation.GenerateImage(),
 	}
@@ -80,6 +79,10 @@ func findMatches() bool {
 		if err != nil {
 			log.Println(err)
 		}
+
+		query1.user.CurrentChat = &newChat
+		query2.user.CurrentChat = &newChat
+
 		query1.user.WebSocket.WriteMessage(1, packet)
 		query2.user.WebSocket.WriteMessage(1, packet)
 	}

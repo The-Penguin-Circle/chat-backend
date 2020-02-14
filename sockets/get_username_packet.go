@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/The-Penguin-Circle/chat-backend/penguintypes"
 	"github.com/gorilla/websocket"
+	"log"
 )
 
 type getUsernamePacket struct {
@@ -28,15 +29,12 @@ func execGetUsername(p []byte, conn *websocket.Conn) error {
 		user.ChangeUsername()
 	}
 
-	responseInBytes, err := json.Marshal(user)
-
+	err = conn.WriteJSON(struct {
+		Type string            `json:"type"`
+		Data penguintypes.User `json:"data"`
+	}{"get-username", *user})
 	if err != nil {
-		return err
-	}
-
-	err = conn.WriteMessage(1, responseInBytes)
-	if err != nil {
-		return err
+		log.Println(err)
 	}
 
 	return nil

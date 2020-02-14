@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/The-Penguin-Circle/chat-backend/penguintypes"
 	"github.com/gorilla/websocket"
+	"log"
 )
 
 type matchMePacket struct {
@@ -19,8 +20,8 @@ func execMatchMePacket(p []byte, conn *websocket.Conn) error {
 		return errors.New("error: could not unmarshal that json")
 	}
 
-	if newPacket.QuestionID < -1 {
-		return errors.New("question id must be at least -1")
+	if newPacket.QuestionID < 0 {
+		return errors.New("question id must be at least 0")
 	}
 	if newPacket.Answer == "" {
 		return errors.New("answer cannot be empty")
@@ -30,15 +31,12 @@ func execMatchMePacket(p []byte, conn *websocket.Conn) error {
 
 	user.WebSocket = conn
 
-	responseInBytes, err := json.Marshal(user)
-
+	err = conn.WriteJSON(struct {
+		Type string            `json:"type"`
+		Data penguintypes.User `json:"data"`
+	}{"match-me", *user})
 	if err != nil {
-		return err
-	}
-
-	err = conn.WriteMessage(1, responseInBytes)
-	if err != nil {
-		return err
+		log.Println(err)
 	}
 
 	return nil

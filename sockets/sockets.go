@@ -4,7 +4,6 @@ package sockets
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -50,6 +49,9 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 				log.Println(err)
 			}
 
+			log.Println("new packet")
+			log.Println(packet.Type)
+
 			switch packet.Type {
 			case "match-me":
 				err := execMatchMePacket(p, conn)
@@ -58,8 +60,13 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 					conn.WriteMessage(1, []byte(err.Error()))
 				}
 			case "get-username":
-				fmt.Println("get-username reached")
 				err := execGetUsername(p, conn)
+				if err != nil {
+					log.Println(err)
+					conn.WriteMessage(1, []byte(err.Error()))
+				}
+			case "chat-message":
+				err := execChatPacket(p, conn)
 				if err != nil {
 					log.Println(err)
 					conn.WriteMessage(1, []byte(err.Error()))
