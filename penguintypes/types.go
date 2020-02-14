@@ -1,5 +1,5 @@
-// Package types has all the types
-package types
+// Package penguintypes has all the types
+package penguintypes
 
 import "time"
 
@@ -10,10 +10,10 @@ type UserIdentifier string
 
 // A User is a user.
 type User struct {
-	Identifier   UserIdentifier `json:"identifier"`
-	Username     string         `json:"username"`
-	ProfileImage string         `json:"image"`
-	WebSocket    *websocket.Conn
+	Identifier   UserIdentifier  `json:"identifier"`
+	Username     string          `json:"username"`
+	ProfileImage string          `json:"image"`
+	WebSocket    *websocket.Conn `json:"-"`
 	currentChat  *Chat
 }
 

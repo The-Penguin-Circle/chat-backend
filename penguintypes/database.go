@@ -1,4 +1,4 @@
-package types
+package penguintypes
 
 import "sync"
 

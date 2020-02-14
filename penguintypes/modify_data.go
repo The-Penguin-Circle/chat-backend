@@ -1,10 +1,10 @@
-package types
+package penguintypes
 
 import (
 	"math/rand"
 )
 
-func insertUser(questionID int, answer string) *User {
+func InsertUser(questionID int, answer string) *User {
 	user := User{
 		Identifier:  UserIdentifier(randStringRunes(10)),
 		currentChat: nil,
@@ -15,18 +15,27 @@ func insertUser(questionID int, answer string) *User {
 		questionAnswer: answer,
 	}
 	DBMutex.Lock()
+	defer DBMutex.Unlock()
+
 	AllUsers = append(AllUsers, user)
 	AllQueries = append(AllQueries, query)
-	DBMutex.Unlock()
-	go findMatches()
+
+	go FindMatches()
 
 	return &user
 }
 
-func findMatches() {
+func FindMatches() bool {
 	DBMutex.Lock()
 	defer DBMutex.Unlock()
-	// TODO: Find matches and add resulting chat to database, remove the query from AllQueries
+
+	// for _, query1 := range AllQueries {
+	// 	for _, query2 := range AllQueries {
+
+	// 	}
+	// }
+
+	return true
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")

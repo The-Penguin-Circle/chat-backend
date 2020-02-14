@@ -2,6 +2,7 @@
 package sockets
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gorilla/websocket"
 	"log"
@@ -9,8 +10,12 @@ import (
 )
 
 type webSocketPacket struct {
-	Type string      `json:"type"`
-	Data interface{} `json:"data"`
+	Type string `json:"type"`
+}
+
+type matchMePacket struct {
+	QuestionID int    `json:"questionID"`
+	Answer     string `json:"answer"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -32,18 +37,32 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 	go func() {
 		for {
 			messageType, p, err := conn.ReadMessage()
+
 			log.Println(messageType)
 			log.Println(p)
 			if err != nil {
 				log.Println(err)
+				conn.Close()
+				return
 			}
 
-			var packet 
+			var packet webSocketPacket
 
-			err = conn.WriteMessage(messageType, p)
+			err = json.Unmarshal(p, &packet)
 			if err != nil {
+				conn.WriteMessage(1, []byte("error: could not unmarshal that json"))
 				log.Println(err)
 			}
+
+			switch packet.Type {
+			case "match-me":
+				err := execMatchMePacket(p, conn)
+				if err != nil {
+					log.Println(err)
+					conn.WriteMessage(1, []byte(err.Error()))
+				}
+			}
+
 		}
 	}()
 	return nil
