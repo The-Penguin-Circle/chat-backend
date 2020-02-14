@@ -1,0 +1,12 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup go
+        uses: actions/setup-go
+      - name: Set up git repo
+        uses: actions/checkout@v2
+      - name: Build executable
+        run: go build
