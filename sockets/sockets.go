@@ -4,6 +4,7 @@ package sockets
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -11,11 +12,6 @@ import (
 
 type webSocketPacket struct {
 	Type string `json:"type"`
-}
-
-type matchMePacket struct {
-	QuestionID int    `json:"questionID"`
-	Answer     string `json:"answer"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -57,6 +53,13 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 			switch packet.Type {
 			case "match-me":
 				err := execMatchMePacket(p, conn)
+				if err != nil {
+					log.Println(err)
+					conn.WriteMessage(1, []byte(err.Error()))
+				}
+			case "get-username":
+				fmt.Println("get-username reached")
+				err := execGetUsername(p, conn)
 				if err != nil {
 					log.Println(err)
 					conn.WriteMessage(1, []byte(err.Error()))

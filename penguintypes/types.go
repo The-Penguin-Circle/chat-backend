@@ -1,8 +1,6 @@
 // Package penguintypes has all the types
 package penguintypes
 
-import "time"
-
 import "github.com/gorilla/websocket"
 
 // The UserIdentifier is a random string that is stored in the user's cookie.
@@ -27,15 +25,13 @@ type ChatQuery struct {
 
 // A Chat is a chat between two users with messages and answers of questions.
 type Chat struct {
-	Users    [2]UserIdentifier `json:"users"`
-	Messages []Message         `json:"messages"`
-	Question string            `json:"question"`
-	Answers  [2]Message        `json:"answers"`
+	Users      [2]User    `json:"users"`
+	QuestionID int        `json:"questionID"`
+	Answers    [2]Message `json:"answers"`
 }
 
 // A Message is a chat maessage.
 type Message struct {
 	SentBy  UserIdentifier `json:"sentBy"`
-	At      time.Time      `json:"at"`
 	Content string         `json:"content"`
 }

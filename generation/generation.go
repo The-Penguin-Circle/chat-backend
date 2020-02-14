@@ -68,11 +68,10 @@ func getRandomConsonant() string {
 }
 
 // GenerateImage returns an image as base64.
-func GenerateImage() (string, error) {
-
+func GenerateImage() string {
 	resp, err := http.Get("https://robohash.org/" + strconv.Itoa(random.Int()))
 	if err != nil {
-		return defaultImageBase64, nil
+		return defaultImageBase64
 	}
 
 	defer resp.Body.Close()
@@ -80,8 +79,8 @@ func GenerateImage() (string, error) {
 	data, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return defaultImageBase64, nil
+		return defaultImageBase64
 	}
 
-	return base64.StdEncoding.EncodeToString(data), nil
+	return base64.StdEncoding.EncodeToString(data)
 }

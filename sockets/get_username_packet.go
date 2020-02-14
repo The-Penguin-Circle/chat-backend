@@ -7,21 +7,26 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func execMatchMePacket(p []byte, conn *websocket.Conn) error {
-	var newPacket matchMePacket
+type getUsernamePacket struct {
+	GenerateNew bool   `json:"generateNew"`
+	Identifier  string `json:"identifier"`
+}
+
+func execGetUsername(p []byte, conn *websocket.Conn) error {
+	var newPacket getUsernamePacket
 	err := json.Unmarshal(p, &newPacket)
 	if err != nil {
 		return errors.New("error: could not unmarshal that json")
 	}
 
-	if newPacket.QuestionID < -1 {
-		return errors.New("question id must be at least -1")
-	}
-	if newPacket.Answer == "" {
-		return errors.New("answer cannot be empty")
+	user := penguintypes.GetUserByIdentifier(penguintypes.UserIdentifier(newPacket.Identifier))
+	if user == nil {
+		return errors.New("that user does not exist")
 	}
 
-	user := penguintypes.InsertUser(newPacket.QuestionID, newPacket.Answer)
+	if newPacket.GenerateNew {
+		user.ChangeUsername()
+	}
 
 	responseInBytes, err := json.Marshal(user)
 
