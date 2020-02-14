@@ -54,15 +54,9 @@ func findMatches() {
 				*query2.user,
 			},
 			QuestionID: query1.questionID,
-			Answers: [2]Message{
-				Message{
-					SentBy:  query1.user.Identifier,
-					Content: query1.questionAnswer,
-				},
-				Message{
-					SentBy:  query2.user.Identifier,
-					Content: query2.questionAnswer,
-				},
+			Answers: [2]string{
+				query1.questionAnswer,
+				query2.questionAnswer,
 			},
 		}
 		AllChats = append(AllChats, newChat)

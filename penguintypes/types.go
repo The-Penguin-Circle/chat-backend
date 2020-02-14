@@ -25,13 +25,7 @@ type ChatQuery struct {
 
 // A Chat is a chat between two users with messages and answers of questions.
 type Chat struct {
-	Users      [2]User    `json:"users"`
-	QuestionID int        `json:"questionID"`
-	Answers    [2]Message `json:"answers"`
-}
-
-// A Message is a chat maessage.
-type Message struct {
-	SentBy  UserIdentifier `json:"sentBy"`
-	Content string         `json:"content"`
+	Users      [2]User   `json:"users"`
+	QuestionID int       `json:"questionID"`
+	Answers    [2]string `json:"answers"`
 }
