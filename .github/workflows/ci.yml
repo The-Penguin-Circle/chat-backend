@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup go
-        uses: actions/setup-go
+        uses: actions/setup-go@v1
       - name: Set up git repo
         uses: actions/checkout@v2
       - name: Build executable
