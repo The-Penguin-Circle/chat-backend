@@ -1,0 +1,22 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    env:
+      GO111MODULE: on
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+      - name: Set up git repo
+        uses: actions/checkout@v2
+      - name: Build executable
+        run: go build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: chat-backend-${{ matrix.platform }}
+          path: chat-backend
