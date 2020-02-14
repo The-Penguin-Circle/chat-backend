@@ -14,7 +14,6 @@ type chatPacket struct {
 }
 
 func execChatPacket(p []byte, conn *websocket.Conn) error {
-	log.Println("chatting...")
 	var newPacket chatPacket
 	err := json.Unmarshal(p, &newPacket)
 	if err != nil {
@@ -25,14 +24,12 @@ func execChatPacket(p []byte, conn *websocket.Conn) error {
 		return errors.New("message cannot be empty")
 	}
 
-	user := penguintypes.GetUserByIdentifier(penguintypes.UserIdentifier(newPacket.Identifier))
+	user := penguintypes.GetUserByIdentifier(newPacket.Identifier)
 	if user == nil {
 		return errors.New("that user does not exist")
 	}
 
 	var otherUser penguintypes.User
-	log.Println(otherUser.CurrentChat)
-	log.Println(otherUser.CurrentChat.Users)
 	for _, u := range user.CurrentChat.Users {
 		if user.Identifier != u.Identifier {
 			otherUser = u

@@ -31,10 +31,8 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 
 	go func() {
 		for {
-			messageType, p, err := conn.ReadMessage()
+			_, p, err := conn.ReadMessage()
 
-			log.Println(messageType)
-			log.Println(p)
 			if err != nil {
 				log.Println(err)
 				conn.Close()
@@ -48,9 +46,6 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 				conn.WriteMessage(1, []byte("error: could not unmarshal that json"))
 				log.Println(err)
 			}
-
-			log.Println("new packet")
-			log.Println(packet.Type)
 
 			switch packet.Type {
 			case "match-me":

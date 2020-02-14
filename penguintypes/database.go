@@ -4,8 +4,8 @@ import "sync"
 
 // The spoof database
 
-// DBMutex is the database mutex
-var DBMutex sync.Mutex
+// dbMutex is the database mutex
+var dbMutex sync.Mutex
 
 // AllUsers contains all of the users
 var AllUsers []User

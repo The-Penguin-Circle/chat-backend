@@ -18,11 +18,10 @@ func InsertUser(questionID int, answer string) *User {
 		questionID:     questionID,
 		questionAnswer: answer,
 	}
-	DBMutex.Lock()
-	defer DBMutex.Unlock()
-
+	dbMutex.Lock()
 	AllUsers = append(AllUsers, user)
 	AllQueries = append(AllQueries, query)
+	dbMutex.Unlock()
 
 	go findMatches()
 
@@ -34,9 +33,9 @@ func (u *User) ChangeUsername() {
 	u.Username = generation.GenerateUsername()
 }
 
-func findMatches() bool {
-	DBMutex.Lock()
-	defer DBMutex.Unlock()
+func findMatches() {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
 
 	remove := func(q ChatQuery) {
 		for i, q3 := range AllQueries {
@@ -46,7 +45,7 @@ func findMatches() bool {
 		}
 	}
 
-	onSuccess := func(query1 ChatQuery, query2 ChatQuery) {
+	onSuccess := func(query1 ChatQuery, query2 ChatQuery) Chat {
 		remove(query1)
 		remove(query2)
 		newChat := Chat{
@@ -80,27 +79,37 @@ func findMatches() bool {
 			log.Println(err)
 		}
 
-		query1.user.CurrentChat = &newChat
-		query2.user.CurrentChat = &newChat
-
 		query1.user.WebSocket.WriteMessage(1, packet)
 		query2.user.WebSocket.WriteMessage(1, packet)
+
+		return newChat
 	}
 
 	for _, query1 := range AllQueries {
 		for _, query2 := range AllQueries {
 			if query1 != query2 && query1.questionID == query2.questionID {
-				onSuccess(query1, query2)
+				identifer1 := query1.user.Identifier
+				identifer2 := query2.user.Identifier
+				chat := onSuccess(query1, query2)
+				setChat := func(identifier UserIdentifier) {
+					for i := range AllUsers {
+						if AllUsers[i].Identifier == identifier {
+							AllUsers[i].CurrentChat = &chat
+						}
+					}
+				}
+
+				setChat(identifer1)
+				setChat(identifer2)
+				return
 			}
 		}
 	}
-
-	return true
 }
 
 func GetUserByIdentifier(identifier UserIdentifier) *User {
-	DBMutex.Lock()
-	defer DBMutex.Unlock()
+	// dbMutex.Lock()
+	// defer dbMutex.Unlock()
 	for _, u := range AllUsers {
 		if u.Identifier == identifier {
 			return &u
