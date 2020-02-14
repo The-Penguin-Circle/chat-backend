@@ -18,5 +18,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v1
         with:
-          name: chat-backend artifact
+          name: chat-backend-${{ matrix.platform }}
           path: chat-backend
