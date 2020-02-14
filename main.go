@@ -24,5 +24,16 @@ func main() {
 	flag.Parse()
 	http.HandleFunc("/get-questions", errorClosure(questions.ServeQuestions))
 	http.HandleFunc("/websocket", errorClosure(sockets.WebSocket))
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), nil))
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println(err)
+			log.Println("soos")
+			// main()
+		}
+	}()
+	for {
+		err := http.ListenAndServe(":"+strconv.Itoa(*port), nil)
+		log.Println(err)
+	}
+
 }

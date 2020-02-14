@@ -67,7 +67,6 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 					conn.WriteMessage(1, []byte(err.Error()))
 				}
 			}
-
 		}
 	}()
 	return nil

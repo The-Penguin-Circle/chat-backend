@@ -1,7 +1,6 @@
 package penguintypes
 
 import (
-	"encoding/json"
 	"github.com/The-Penguin-Circle/chat-backend/generation"
 	"math/rand"
 )
@@ -60,25 +59,28 @@ func findMatches() {
 		}
 		AllChats = append(AllChats, newChat)
 
-		json.Marshal(struct {
-			string `json:"type"`
-			Chat   `json:"chat"`
-		}{
-			"match-success",
-			newChat,
-		})
+		type matchResponse struct {
+			OtherUser     User   `json:"otherUser"`
+			OtherResponse string `json:"otherResponse"`
+		}
 
 		query1.user.WebSocket.WriteJSON(
 			struct {
-				Type string `json:"type"`
-				Data Chat   `json:"data"`
-			}{"chat-found", newChat},
+				Type string        `json:"type"`
+				Data matchResponse `json:"data"`
+			}{"chat-found", matchResponse{
+				OtherUser:     *query2.user,
+				OtherResponse: query2.questionAnswer,
+			}},
 		)
 		query2.user.WebSocket.WriteJSON(
 			struct {
-				Type string `json:"type"`
-				Data Chat   `json:"data"`
-			}{"chat-found", newChat},
+				Type string        `json:"type"`
+				Data matchResponse `json:"data"`
+			}{"chat-found", matchResponse{
+				OtherUser:     *query1.user,
+				OtherResponse: query1.questionAnswer,
+			}},
 		)
 
 		return newChat
@@ -107,8 +109,8 @@ func findMatches() {
 }
 
 func GetUserByIdentifier(identifier UserIdentifier) *User {
-	// dbMutex.Lock()
-	// defer dbMutex.Unlock()
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
 	for _, u := range AllUsers {
 		if u.Identifier == identifier {
 			return &u

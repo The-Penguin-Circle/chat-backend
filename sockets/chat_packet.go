@@ -50,7 +50,6 @@ func execChatPacket(p []byte, conn *websocket.Conn) error {
 			Message: newPacket.Message,
 		},
 	})
-
 	if err != nil {
 		log.Println(err)
 	}
