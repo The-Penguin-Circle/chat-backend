@@ -2,11 +2,13 @@
 package generation
 
 import (
+	"bufio"
 	"encoding/base64"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -14,16 +16,22 @@ import (
 
 var random = rand.New(rand.NewSource(time.Now().Unix()))
 var defaultImageBase64 string
+var syllables []string
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
-	content, err := ioutil.ReadFile("files/defaultImage.txt")
+	defaultImage, err := ioutil.ReadFile("files/defaultImage.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defaultImageBase64 = string(content)
+	defaultImageBase64 = string(defaultImage)
+
+	syllables, err = readLines("files/syllables.txt")
+	if err != nil {
+		log.Fatalf("readLines: %s", err)
+	}
 }
 
 // GenerateUsername returns a username.
@@ -39,20 +47,14 @@ func generateName(length int) string {
 
 	name := ""
 
-	for i := 0; i < length; i++ {
-
-		if i%2 == 0 {
-			name += getRandomConsonant()
-		} else {
-			name += getRandomVocal()
-		}
-
+	for i := 0; i < random.Intn(2)+1; i++ {
+		name += syllables[random.Intn(len(syllables)-1)]
 		if i == 0 {
-			name = strings.ToUpper(name)
+			name += getRandomVocal()
 		}
 	}
 
-	return name
+	return strings.Title(name)
 }
 
 func getRandomVocal() string {
@@ -65,6 +67,21 @@ func getRandomConsonant() string {
 	consonats := []string{"b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z"}
 
 	return consonats[random.Intn(len(consonats))]
+}
+
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
 }
 
 // GenerateImage returns an image as base64.
