@@ -16,9 +16,9 @@ jobs:
       - name: Set up git repo
         uses: actions/checkout@v2
       - name: Build executable
-        run: go build
+        run: go build -o bin/
       - name: Upload build artifact
         uses: actions/upload-artifact@v1
         with:
           name: chat-backend-${{ matrix.platform }}
-          path: ./chat-backend*-latest
+          path: bin/
