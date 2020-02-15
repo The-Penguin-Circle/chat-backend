@@ -1,5 +1,7 @@
 # The Troca Chat Backend
 
+[![Build status](https://img.shields.io/github/workflow/status/The-Penguin-Circle/chat-backend/CI/master)](https://github.com/The-Penguin-Circle/chat-backend/actions)
+
 This is the backend for the Troca chat app, created on the 2020 Q1
 Hackathon of the Welthungerhilfe. It communicates
 with the frontend over websockets.
