@@ -1,4 +1,7 @@
-# The Troca Chat Backend
+<div align=center>
+<img src="./.assets/troca.png" height="200px">
+<h1>The Troca Chat Backend</h1>
+</div>
 
 [![Build status](https://img.shields.io/github/workflow/status/The-Penguin-Circle/chat-backend/CI/master)](https://github.com/The-Penguin-Circle/chat-backend/actions) [![License](https://img.shields.io/github/license/The-Penguin-Circle/chat-backend)](https://github.com/The-Penguin-Circle/chat-backend/blob/master/LICENSE)
 
