@@ -41,18 +41,23 @@ func execChatPacket(p []byte, conn *websocket.Conn) error {
 		Message string `json:"message"`
 	}
 
-	err = otherUser.WebSocket.WriteJSON(struct {
-		Type string        `json:"type"`
-		Data messagePacket `json:"data"`
-	}{
-		Type: "chat-message",
-		Data: messagePacket{
-			Message: newPacket.Message,
-		},
-	})
-	if err != nil {
-		log.Println(err)
-	}
+	go func() {
+		otherUser.WebSocketMutex.Lock()
+		defer otherUser.WebSocketMutex.Unlock()
+
+		err = otherUser.WebSocket.WriteJSON(struct {
+			Type string        `json:"type"`
+			Data messagePacket `json:"data"`
+		}{
+			Type: "chat-message",
+			Data: messagePacket{
+				Message: newPacket.Message,
+			},
+		})
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	err = conn.WriteJSON(struct {
 		Type string `json:"type"`

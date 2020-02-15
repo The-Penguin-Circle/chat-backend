@@ -6,6 +6,7 @@ import (
 	"github.com/The-Penguin-Circle/chat-backend/penguintypes"
 	"github.com/gorilla/websocket"
 	"log"
+	"sync"
 )
 
 type matchMePacket struct {
@@ -13,7 +14,7 @@ type matchMePacket struct {
 	Answer     string `json:"answer"`
 }
 
-func execMatchMePacket(p []byte, conn *websocket.Conn) error {
+func execMatchMePacket(p []byte, conn *websocket.Conn, mutex *sync.Mutex) error {
 	var newPacket matchMePacket
 	err := json.Unmarshal(p, &newPacket)
 	if err != nil {
@@ -27,9 +28,7 @@ func execMatchMePacket(p []byte, conn *websocket.Conn) error {
 		return errors.New("answer cannot be empty")
 	}
 
-	user := penguintypes.InsertUser(newPacket.QuestionID, newPacket.Answer)
-
-	user.WebSocket = conn
+	user := penguintypes.InsertUser(newPacket.QuestionID, newPacket.Answer, mutex, conn)
 
 	err = conn.WriteJSON(struct {
 		Type string            `json:"type"`

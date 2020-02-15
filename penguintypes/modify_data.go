@@ -2,14 +2,18 @@ package penguintypes
 
 import (
 	"github.com/The-Penguin-Circle/chat-backend/generation"
+	"github.com/gorilla/websocket"
 	"math/rand"
+	"sync"
 )
 
-func InsertUser(questionID int, answer string) *User {
+func InsertUser(questionID int, answer string, mutex *sync.Mutex, connection *websocket.Conn) *User {
 	user := User{
-		Identifier:   UserIdentifier(randStringRunes(10)),
-		Username:     generation.GenerateUsername(),
-		ProfileImage: generation.GenerateImage(),
+		Identifier:     UserIdentifier(randStringRunes(10)),
+		Username:       generation.GenerateUsername(),
+		ProfileImage:   generation.GenerateImage(),
+		WebSocket:      connection,
+		WebSocketMutex: mutex,
 	}
 	query := ChatQuery{
 		user:           &user,
@@ -21,7 +25,7 @@ func InsertUser(questionID int, answer string) *User {
 	AllQueries = append(AllQueries, query)
 	dbMutex.Unlock()
 
-	go findMatches()
+	findMatches()
 
 	return &user
 }
@@ -64,24 +68,31 @@ func findMatches() {
 			OtherResponse string `json:"otherResponse"`
 		}
 
-		query1.user.WebSocket.WriteJSON(
-			struct {
-				Type string        `json:"type"`
-				Data matchResponse `json:"data"`
-			}{"chat-found", matchResponse{
-				OtherUser:     *query2.user,
-				OtherResponse: query2.questionAnswer,
-			}},
-		)
-		query2.user.WebSocket.WriteJSON(
-			struct {
-				Type string        `json:"type"`
-				Data matchResponse `json:"data"`
-			}{"chat-found", matchResponse{
-				OtherUser:     *query1.user,
-				OtherResponse: query1.questionAnswer,
-			}},
-		)
+		go func() {
+			query1.user.WebSocketMutex.Lock()
+			query1.user.WebSocket.WriteJSON(
+				struct {
+					Type string        `json:"type"`
+					Data matchResponse `json:"data"`
+				}{"chat-found", matchResponse{
+					OtherUser:     *query2.user,
+					OtherResponse: query2.questionAnswer,
+				}},
+			)
+			query1.user.WebSocketMutex.Unlock()
+
+			query2.user.WebSocketMutex.Lock()
+			query2.user.WebSocket.WriteJSON(
+				struct {
+					Type string        `json:"type"`
+					Data matchResponse `json:"data"`
+				}{"chat-found", matchResponse{
+					OtherUser:     *query1.user,
+					OtherResponse: query1.questionAnswer,
+				}},
+			)
+			query2.user.WebSocketMutex.Unlock()
+		}()
 
 		return newChat
 	}

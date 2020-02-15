@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"sync"
 )
 
 type webSocketPacket struct {
@@ -30,6 +31,7 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	go func() {
+		var mutex sync.Mutex
 		for {
 			_, p, err := conn.ReadMessage()
 
@@ -47,9 +49,14 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 				log.Println(err)
 			}
 
+			mutex.Lock()
+
+			log.Println("recieved question")
+
 			switch packet.Type {
 			case "match-me":
-				err := execMatchMePacket(p, conn)
+				err := execMatchMePacket(p, conn, &mutex)
+				log.Println("returned answer")
 				if err != nil {
 					log.Println(err)
 					conn.WriteMessage(1, []byte(err.Error()))
@@ -67,6 +74,7 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 					conn.WriteMessage(1, []byte(err.Error()))
 				}
 			}
+			mutex.Unlock()
 		}
 	}()
 	return nil
