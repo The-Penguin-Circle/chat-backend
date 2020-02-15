@@ -30,6 +30,9 @@ func execChatPacket(p []byte, conn *websocket.Conn) error {
 	}
 
 	var otherUser penguintypes.User
+	if user.CurrentChat == nil {
+		return errors.New("no such chat")
+	}
 	for _, u := range user.CurrentChat.Users {
 		if user.Identifier != u.Identifier {
 			otherUser = u
