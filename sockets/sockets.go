@@ -52,8 +52,6 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 
 			mutex.Lock()
 
-			log.Println("recieved question")
-
 			switch packet.Type {
 			case "match-me":
 				err := execMatchMePacket(p, conn, &mutex)
