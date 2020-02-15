@@ -30,8 +30,9 @@ func WebSocket(w http.ResponseWriter, r *http.Request) error {
 		return errors.New("websocket could not be opened")
 	}
 
+	var mutex sync.Mutex
+
 	go func() {
-		var mutex sync.Mutex
 		for {
 			_, p, err := conn.ReadMessage()
 
